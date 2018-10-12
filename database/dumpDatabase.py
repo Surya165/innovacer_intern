@@ -1,4 +1,4 @@
-import mysql.connector()
+import mysql.connector
 def insertEntry(email,seriesNames):
     return
 
@@ -9,6 +9,11 @@ def insertEntry(email,seriesNames):
 #2.The list of seriesNames
 #This function reads the lists and modifies the databse appropriately
 def dumpDatabase(emails,seriesNames):
+    mydb = mysql.connector.connect(
+    host="localhost",
+    user="yourusername",
+    passwd="yourpassword"
+    )
     for i in range(len(emails)):
         insertEntry(emails[i],seriesNames[i])
 
