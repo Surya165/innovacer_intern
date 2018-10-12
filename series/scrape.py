@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup
 import datetime
 import smtplib
 import config
-import socks
 from time import time
 baseLink = "https://www.imdb.com"
 def getNumberedDate(date):
@@ -138,8 +137,13 @@ def getData(seriesName):
         return "The next episode's air date is still to be declared"
     formattedDate = getFormattedDate(nextEpisodeDate)
     return "The next Episode Airs at "+ formattedDate
+<<<<<<< HEAD
 message = "vinay"
 message = getData('suits')
+=======
+'''message = "vinay"
+message = getData('flash')
+>>>>>>> ddd39c23c06536f3901b12b18013a6f61283dd0a
 print(message)
-targetMail = "ihm2015004@iiita.ac.in"
+targetMail = "ihm2015004@iiita.ac.in"'''
 #sendMail(message,targetMail)
