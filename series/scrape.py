@@ -36,13 +36,19 @@ def getNumberedDate(date):
     numberedDate += int(date)
     return numberedDate
 def getSeriesSearchPage(seriesName):
+    print("Getting the request")
     data = requests.get('https://www.imdb.com/find?ref_=nv_sr_fn&q='+seriesName+'&s=all')
+    print("Got the request")
     soup = BeautifulSoup(data.text,"lxml")
     return soup
 def getSeriesSuggestionList(divs):
     linksList = []
+    namesList = []
     for div in divs:
         for tr in div.find_all('td',{'class':'result_text'}):
+            name = tr.text
+            if(name.find('(TV Series)') == -1):
+                continue
             links = tr.find_all('a')
             #print(len(links))
             if(len(links) == 0):
@@ -50,12 +56,14 @@ def getSeriesSuggestionList(divs):
                 return
             for a in links:
                 linksList.append(baseLink + a.attrs['href'])
-    return linksList
+                print(name.strip())
+                namesList.append(name.strip())
+    return linksList,namesList
 def getSeriesPage(soup,baseLink):
     divs = soup.find_all('div',{'class':'findSection'})
     if(len(divs) == 0):
         return None
-    link = getSeriesSuggestionList(divs)[0]
+    link = getSeriesSuggestionList(divs)[0][0]
     data = requests.get(link)
     soup = BeautifulSoup(data.text,"lxml")
     return soup
@@ -115,8 +123,8 @@ def getFormattedDate(date):
 
 def getData(seriesName):
     baseLink = "https://www.imdb.com"
-
     soup = getSeriesSearchPage(seriesName)
+    print("Got the Series Page")
     soup = getSeriesPage(soup,baseLink)
 
     if(soup == None):
@@ -131,7 +139,7 @@ def getData(seriesName):
     formattedDate = getFormattedDate(nextEpisodeDate)
     return "The next Episode Airs at "+ formattedDate
 message = "vinay"
-message = getData('flash')
+message = getData('suits')
 print(message)
 targetMail = "ihm2015004@iiita.ac.in"
 #sendMail(message,targetMail)
