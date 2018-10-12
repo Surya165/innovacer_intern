@@ -1,7 +1,13 @@
+import sys
+sys.path.append("..")
 import requests
 from bs4 import BeautifulSoup
-import time
 import datetime
+import smtplib
+import config
+import socks
+from time import time
+baseLink = "https://www.imdb.com"
 def getNumberedDate(date):
     datesDict = {'Jan':1,
     'Feb':2,
@@ -29,32 +35,31 @@ def getNumberedDate(date):
     numberedDate *= 100
     numberedDate += int(date)
     return numberedDate
-
-def getData(seriesName):
+def getSeriesSearchPage(seriesName):
     data = requests.get('https://www.imdb.com/find?ref_=nv_sr_fn&q='+seriesName+'&s=all')
     soup = BeautifulSoup(data.text,"lxml")
-    if(soup):
-        print("soup exists")
-    baseLink = "https://www.imdb.com"
-    actualLink = "https://www.imdb.com/title/tt1396484/?ref_=fn_al_tt_1"
-    divs = soup.find_all('div',{'class':'findSection'})
-    if(len(divs) == 0):
-        print("The Series "+seriesName+ " doesn't seem to exist")
-        return
+    return soup
+def getSeriesSuggestionList(divs):
+    linksList = []
     for div in divs:
         for tr in div.find_all('td',{'class':'result_text'}):
             links = tr.find_all('a')
-            print(len(links))
+            #print(len(links))
             if(len(links) == 0):
-                print("The site "+seriesName+" doesn't seem to exist")
+                #print("The site "+seriesName+" doesn't seem to exist")
                 return
             for a in links:
-                link = baseLink + a.attrs['href']
-            break
-        break
-    print(link)
+                linksList.append(baseLink + a.attrs['href'])
+    return linksList
+def getSeriesPage(soup,baseLink):
+    divs = soup.find_all('div',{'class':'findSection'})
+    if(len(divs) == 0):
+        return None
+    link = getSeriesSuggestionList(divs)[0]
     data = requests.get(link)
     soup = BeautifulSoup(data.text,"lxml")
+    return soup
+def checkIfSeriesComplete(soup):
     titleBlock = soup.find_all('div',{'class':'titleBar'})
     titleBlock = titleBlock[0]
     subtext = titleBlock.find_all('div',{'class':'subtext'})[0]
@@ -66,22 +71,24 @@ def getData(seriesName):
     timeline = timeline.replace('TV Series',"")
     timeline = timeline.replace(" ","")
     timeline = timeline[6:-2]
-    print(timeline)
+    #print(timeline)
     if(len(timeline) != 0):
-        print("Series completed all it's episodes in "+timeline)
-        return
+        return True
+    return False
+def getLastSeasonLink(soup):
     articles = soup.find_all('div',{'class':'seasons-and-year-nav'})[0]
     lastSeason = articles.find_all('a')[0]
     lastSeason = lastSeason.attrs['href']
     lastSeasonLink = baseLink + lastSeason
-    actualLink = "https://www.imdb.com/title/tt0944947/episodes?season=8&ref_=tt_eps_sn_8"
-    #print(actualLink)
-    #print(lastSeasonLink)
+    return lastSeasonLink
+def getAirDates(soup):
+    lastSeasonLink = getLastSeasonLink(soup)
     data = requests.get(lastSeasonLink)
     soup = BeautifulSoup(data.text,"lxml")
     nextEpisode = soup.find_all('div',{'class':'list detail eplist'})[0]
     airDates = nextEpisode.find_all('div',{'class':'airdate'})
-    #print(len(airDates))
+    return airDates
+def getNextEpisodeDate(airDates):
     ds = ""
     currentDate = datetime.datetime.now().strftime("%Y%m%d")
     currentDate = int(currentDate)
@@ -90,13 +97,41 @@ def getData(seriesName):
 
         if(len(ds) == 0):
             break
-        #print(ds)
+        ##print(ds)
         numberedDate = getNumberedDate(ds)
         if(numberedDate > currentDate):
-            print("The next Episode Airs at ",numberedDate)
-            break
-    #print(len(airDates))
+            return numberedDate
+def getFormattedDate(date):
+    monthNames = ['Jan','Feb','Mar','Jun','Jul','Aug','Feb','Aug','Sep','Oct','Nov','Dec']
+    if(date % 10000 == 0):
+        return str(date / 10000)
+    year = str(int(date / 10000))
+    date %= 10000
+    month = int(date / 100)
+    date %= 100
+    day = str(date)
+    monthName = monthNames[month - 1]
+    return day + " " + monthName + " " + year
 
+def getData(seriesName):
+    baseLink = "https://www.imdb.com"
 
-    #print(nextEpisode.text)"""
-getData('friends')
+    soup = getSeriesSearchPage(seriesName)
+    soup = getSeriesPage(soup,baseLink)
+
+    if(soup == None):
+        return "The series with the name "+seriesName+" doesn't seem to exist"
+    if(checkIfSeriesComplete(soup)):
+        return "The Series Completed all it's episodes"
+
+    airDates = getAirDates(soup)
+    nextEpisodeDate = getNextEpisodeDate(airDates)
+    if(nextEpisodeDate == None):
+        return "The next episode's air date is still to be declared"
+    formattedDate = getFormattedDate(nextEpisodeDate)
+    return "The next Episode Airs at "+ formattedDate
+message = "vinay"
+message = getData('flash')
+print(message)
+targetMail = "ihm2015004@iiita.ac.in"
+#sendMail(message,targetMail)
