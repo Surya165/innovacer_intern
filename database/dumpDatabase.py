@@ -1,11 +1,10 @@
 import sys
 
 sys.path.append("..")
-from scraper.search import searchIMDB
+from scraper.search import getNameLink
 from util.fileUtil import readFile
 
 from operations import insertEmail,insertSeries,insertEmailSeries,showEmails,showSeries,showEmailSeries
-from operationsUtil.seriesUtil import getNameLink
 from util.databaseUtil import connect,savedb
 def insertEntry(email,seriesNames,cursor):
     email = email.strip()

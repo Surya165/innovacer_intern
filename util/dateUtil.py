@@ -1,3 +1,4 @@
+import datetime
 def getFormattedDate(date):
     monthNames = ['Jan','Feb','Mar','Jun','Jul','Aug','Feb','Aug','Sep','Oct','Nov','Dec']
     if(date % 10000 == 0):
@@ -36,3 +37,5 @@ def getNumberedDate(date):
     numberedDate *= 100
     numberedDate += int(date)
     return numberedDate
+def getCurrentDate():
+    return int(datetime.datetime.now().strftime("%Y%m%d"))

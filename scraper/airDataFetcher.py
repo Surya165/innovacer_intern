@@ -1,10 +1,11 @@
-import datetime
+
 import requests
 import sys
 sys.path.append("..")
 from util.scrapeUtil import getSoup
-from util.dateUtil import getNumberedDate,getFormattedDate
+from util.dateUtil import getNumberedDate,getFormattedDate,getCurrentDate
 from config import baseLink
+
 def checkIfSeriesComplete(soup):
     titleBlock = soup.find_all('div',{'class':'titleBar'})
     titleBlock = titleBlock[0]
@@ -36,7 +37,7 @@ def getAirDates(soup):
 def getNextEpisodeDate(soup):
     airDates = getAirDates(soup)
     ds = ""
-    currentDate = int(datetime.datetime.now().strftime("%Y%m%d"))
+    currentDate = getCurrentDate()
     for date in airDates:
         ds = date.text.strip()
         if(len(ds) == 0):

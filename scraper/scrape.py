@@ -1,15 +1,19 @@
 import sys
 sys.path.append("..")
+from util.databaseUtil import connect
 from util.scrapeUtil import getSoup
 from config import baseLink as baseLink
 from time import time
-from search import searchIMDB
+from search import getNameLink
 from airDataFetcher import checkIfSeriesComplete,getNextEpisodeDate
+from util.databaseUtil import savedb
 
 
 def getData(seriesName):
-
-    link,name = searchIMDB(seriesName)
+    mydb = connect()
+    cursor = mydb.cursor()
+    name,link,year = getNameLink(seriesName,cursor)
+    savedb(mydb,cursor)
     soup = getSoup(link)
 
     if(soup == None):
@@ -21,7 +25,7 @@ def getData(seriesName):
     return "The next Episode airs at "+nextEpisodeDate
 
 message = "vinay"
-message = getData('flash')
+message = getData('legends of tomorrow')
 
 print(message)
 targetMail = "ihm2015004@iiita.ac.in"
