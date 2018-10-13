@@ -4,8 +4,7 @@ import sys
 sys.path.append("..")
 from util.scrapeUtil import getSoup
 from util.dateUtil import getNumberedDate,getFormattedDate
-
-baseLink = "https://www.imdb.com"
+from config import baseLink
 def checkIfSeriesComplete(soup):
     titleBlock = soup.find_all('div',{'class':'titleBar'})
     titleBlock = titleBlock[0]

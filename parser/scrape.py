@@ -1,15 +1,15 @@
 import sys
 sys.path.append("..")
 from util.scrapeUtil import getSoup
-
+from config import baseLink as baseLink
 from time import time
 from search import searchIMDB
 from airDataFetcher import checkIfSeriesComplete,getNextEpisodeDate
-baseLink = "https://www.imdb.com"
+
 
 def getData(seriesName):
-    baseLink = "https://www.imdb.com"
-    link,name = searchIMDB(seriesName,baseLink)
+
+    link,name = searchIMDB(seriesName)
     soup = getSoup(link)
 
     if(soup == None):
