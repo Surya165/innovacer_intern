@@ -4,7 +4,7 @@ sys.path.append("..")
 from scraper.search import getNameLink
 from util.fileUtil import readFile
 
-from operations import insertEmail,insertSeries,insertEmailSeries,showEmails,showSeries,showEmailSeries
+from operations import insertEmail,insertSeries,insertEmailSeries,showDatabase
 from util.databaseUtil import connect,savedb
 def insertEntry(email,seriesNames,cursor):
     email = email.strip()
@@ -16,19 +16,7 @@ def insertEntry(email,seriesNames,cursor):
         insertSeries(name,link,year,cursor)
         insertEmailSeries(email,name,link,cursor)
     return
-def showDatabase(cursor):
-    breakLine = "\n##########################"
-    print(breakLine)
-    print("Emails:")
-    showEmails(cursor)
 
-    print(breakLine)
-    print("Series:")
-    showSeries(cursor)
-
-    print(breakLine)
-    print("emailSeries:")
-    showEmailSeries(cursor)
     #showEmailSeries(cursor)
 
 
@@ -51,4 +39,4 @@ def dumpDatabase(emails,seriesNames):
 def testWithInputFile(inputFile):
     emails,seriesNames = readFile(inputFile)
     dumpDatabase(emails,seriesNames)
-testWithInputFile('input.txt')
+testWithInputFile('../database/input.txt')

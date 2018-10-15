@@ -59,3 +59,17 @@ def showEmailSeries(cursor):
     result = cursor.fetchall()
     for x in result:
         print(x)
+
+def showDatabase(cursor):
+    breakLine = "\n##########################"
+    print(breakLine)
+    print("Emails:")
+    showEmails(cursor)
+
+    print(breakLine)
+    print("Series:")
+    showSeries(cursor)
+
+    print(breakLine)
+    print("emailSeries:")
+    showEmailSeries(cursor)

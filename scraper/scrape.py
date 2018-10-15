@@ -4,29 +4,43 @@ from util.databaseUtil import connect
 from util.scrapeUtil import getSoup
 from config import baseLink as baseLink
 from time import time
-from search import getNameLink
-from airDataFetcher import checkIfSeriesComplete,getNextEpisodeDate
+from scraper.search import getNameLink
+from scraper.airDataFetcher import checkIfSeriesComplete,getNextEpisodeDate
 from util.databaseUtil import savedb
+from database.operationsUtil.seriesUtil import nextEpisodeStored,isComplete
 
 
-def getData(seriesName):
+#return -2 if the series is non-existent
+#return -1 if the series is complete
+#return the date in numbered format : yyyymmdd if the series is ongoing
+def getData(seriesName,returnDate=False,seriesId=-1):
     mydb = connect()
     cursor = mydb.cursor()
+    if(seriesId!=-1):
+        if(isComplete(cursor,seriesId) == 1):
+            print(seriesId,"is  complete")
+            return -1
+        print(seriesId,"is not complete")
+        possibleNextEpisode = nextEpisodeStored(cursor,seriesId)
+        if(possibleNextEpisode != None):
+            return possibleNextEpisode
+
     name,link,year = getNameLink(seriesName,cursor)
     savedb(mydb,cursor)
     soup = getSoup(link)
 
     if(soup == None):
-        return "The series with the name "+seriesName+" doesn't seem to exist"
+        return -2
     if(checkIfSeriesComplete(soup)):
-        return "The Series Completed all it's episodes"
+        return -1
 
     nextEpisodeDate = getNextEpisodeDate(soup)
-    return "The next Episode airs at "+nextEpisodeDate
+    return nextEpisodeDate
 
-message = "vinay"
-message = getData('legends of tomorrow')
+'''message = "vinay"
+message = getData('got')
+
 
 print(message)
 targetMail = "ihm2015004@iiita.ac.in"
-#sendMail(message,targetMail)
+#sendMail(message,targetMail)'''
