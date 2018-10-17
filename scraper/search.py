@@ -4,6 +4,13 @@ from util.scrapeUtil import getSoup
 from config import baseLink as baseLink
 from database.operationsUtil.seriesUtil import insertNameLink,getSeriesIdByLink
 def checkNameInDatabase(name,cursor):
+    """Checks if the series data is present in the database
+    : type name : string
+    : param name : series name
+
+    : type cursor : cursor
+    : param cursor : mysqlDB cursor
+    """
     search = "select title,link,year,id from nameLinks where lower(name)='"+name.lower()+"';"
     cursor.execute(search)
     result = cursor.fetchall()
@@ -11,10 +18,23 @@ def checkNameInDatabase(name,cursor):
         return(None,None,None,None)
     return result[0]
 def getSeriesSearchPage(seriesName):
+    """Returns the search page of the keyword
+
+    : type seriesName : string
+    : param seriesName : Keyword for searching the series
+    """
     link = 'https://www.imdb.com/find?ref_=nv_sr_fn&q='+seriesName+'&s=all'
     soup = getSoup(link)
     return soup
 def getSearchResult(divs,forList=0):
+    """Returns the links and names from the search page
+
+    : type divs : soup
+    : param divs : soup object of the results division of the search page
+
+    : type forList : int
+    : param forList : argument to determine whether to return the whole result or only the first result
+    """
     linksList = []
     namesList = []
     for div in divs:
@@ -36,6 +56,14 @@ def getSearchResult(divs,forList=0):
                     return link,name
     return linksList,namesList
 def searchIMDB(seriesName,forList=0):
+    """Searches the IMDB site for the seriesName
+
+    : type seriesName : string
+    : param seriesName : keyword for searching the series
+
+    : type forList : int
+    : param forList : argument to determine whether to return the whole result or only the first result
+    """
     soup = getSeriesSearchPage(seriesName)
     divs = soup.find_all('div',{'class':'findSection'})
     if(len(divs) == 0):
@@ -48,6 +76,14 @@ def searchIMDB(seriesName,forList=0):
         return linksList,namesList
     return None
 def getNameLink(series,cursor):
+    """Checks if the link for the keyword is already stored in the database
+
+    : type series : string
+    : param series : keyword for searching the series
+
+    : type cursor : cursor
+    : param cursor : mysqlDB cursor
+     """
     name,link,year,id = checkNameInDatabase(series,cursor)
     if(name == None and link == None):
         print("Fetching the link for "+series)

@@ -1,4 +1,3 @@
-#This file is a draft for the remind file
 import sys
 sys.path.append("..")
 from util.dateUtil import getCurrentDate
@@ -16,20 +15,24 @@ def isTimeToRemind(interval,seriesId="",emailId=""):
 def getRemindList(cursor):
     remindList = []
     seriesIdList,seriesNameList = getSeriesList(cursor)
-    #print(seriesIdList)
+    print(seriesIdList)
     for seriesIndex,seriesId in enumerate(seriesIdList):
         if(isSent(seriesId,cursor)):
             continue
         emailList = getEmailListForSeries(seriesId,cursor)
         #print(emailList)
         for email in emailList:
+            print("getData")
             reminder = (email,getData(seriesNameList[seriesIndex],seriesId=seriesId))
             remindList.append(reminder)
     return remindList
 
-def remind(cursor):
+def remindAll(cursor):
+    print("hello")
     remindList = getRemindList(cursor)
+    print(remindList)
     for email,message in remindList:
+        print("sending mail")
         sendMail(email,message)
 def run(interval):
     mydb = connect()
@@ -41,8 +44,10 @@ def run(interval):
         if(currentTime == previousTime):
             continue
         if(currentTime % interval == 0):
+            remindAll(cursor)
             print("Refresh")
             refresh(cursor)
             print("Reminding")
-            remind(cursor)
+
         previousTime = currentTime
+run(1)

@@ -3,8 +3,8 @@ import sys
 sys.path.append("..")
 import config
 def sendMail(email,message):
-    return
     print("Sent mail to ",email)
+    return
     print("starting")
     server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
     print("server created")
@@ -18,4 +18,3 @@ def sendMail(email,message):
     server.quit()
     print("Quitting server")
     return
-sendMail("iit2015060@iita.ac.in","Dinesh is a bitch")

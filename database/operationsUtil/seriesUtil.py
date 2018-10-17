@@ -1,3 +1,4 @@
+from util.dateUtil import getCurrentDate
 def getEmailListForSeries(seriesId,cursor):
     select = "select emails from emails where id in "
     select +="(select emailId from emailSeries where seriesId='"+str(seriesId)+"');"
@@ -69,19 +70,21 @@ def seriesLinkExists(link,cursor):
 def setIsComplete(cursor,seriesId):
     update ="update series set isComplete=1 where id="+str(seriesId);
     cursor.execute(update)
-def updateSeriesInfo(cursor,name,link,year,nextEpisodeDate):
+def updateSeriesInfo(cursor,name,link,year,nextEpisodeDate,latestEpisodeDate):
+    currentDate = getCurrentDate()
     id = "select id from series where link='"+link+"';"
-    print(name,link,year,nextEpisodeDate)
     cursor.execute(id)
     result = cursor.fetchall()
     if(len(result) != 0):
         id = result[0][0]
         update = "update series set name='"+name+"',"
         update += " year="+str(year)+ ", "
-        update += "nextEpisodeDate="+str(nextEpisodeDate)+";"
+        update += "nextEpisode="+str(nextEpisodeDate)+","
+        update += "lastUpdated='"+str(currentDate)+"'where  link='"+link+"';"
         print(update)
+        cursor.execute(update)
     else:
-        insert = "insert into series (name,link,year,nextEpisode) values"
-        insert += "('"+name+"','"+link+"',"+str(year)+","+str(nextEpisodeDate)+");"
+        insert = "insert into series (name,link,year,nextEpisode,lastUpdated,latestEpisode) values"
+        insert += "('"+name+"','"+link+"',"+str(year)+","+str(nextEpisodeDate)+","+str(currentDate)+","+str(latestEpisodeDate)+");"
         print(insert)
         cursor.execute(insert)
