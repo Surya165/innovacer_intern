@@ -66,6 +66,6 @@ def getNextEpisodeDate(soup):
         numberedDate = getNumberedDate(ds)
         if(numberedDate > currentDate):
             formattedDate = getFormattedDate(numberedDate)
-            return formattedDate,latestDate
+            return numberedDate,latestDate
         lastestDate = numberedDate
     return None,None

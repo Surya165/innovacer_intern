@@ -39,4 +39,4 @@ def dumpDatabase(emails,seriesNames):
 def testWithInputFile(inputFile):
     emails,seriesNames = readFile(inputFile)
     dumpDatabase(emails,seriesNames)
-testWithInputFile('../database/input.txt')
+testWithInputFile('../input.txt')

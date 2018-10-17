@@ -23,7 +23,7 @@ def getRemindList(cursor):
         #print(emailList)
         for email in emailList:
             print("getData")
-            reminder = (email,getData(seriesNameList[seriesIndex],seriesId=seriesId))
+            reminder = (email,getData(seriesNameList[seriesIndex]))
             remindList.append(reminder)
     return remindList
 
@@ -34,11 +34,12 @@ def remindAll(cursor):
     for email,message in remindList:
         print("sending mail")
         sendMail(email,message)
-def run(interval):
+def run(interval,once=False):
     mydb = connect()
     cursor = mydb.cursor()
     previousTime = 0
     print("running")
+    print(once)
     while(1):
         currentTime = getCurrentDate()
         if(currentTime == previousTime):
@@ -48,6 +49,13 @@ def run(interval):
             print("Refresh")
             refresh(cursor)
             print("Reminding")
+        if(once):
+            print("stopping")
+            break
 
         previousTime = currentTime
-run(1)
+def remind(emailList,seriesList):
+    for count,email in enumerate(emailList):
+        for series in seriesList[count]:
+            data = getData(series)
+            sendMail(email,data)

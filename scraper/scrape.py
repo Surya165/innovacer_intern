@@ -59,4 +59,4 @@ def getData(keyword):
     if(possibleNextEpisode != None):
         return possibleNextEpisode
     else:
-        return getDataFromNet(cursor,seriesName,returnDate=True)
+        return getDataFromNet(cursor,keyword,returnDate=True)

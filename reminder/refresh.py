@@ -7,7 +7,7 @@ def refresh(cursor):
     seriesIdList,seriesNameList = getSeriesList(cursor)
     print(seriesIdList)
     for count,seriesId in enumerate(seriesIdList):
-        #print(seriesId)
+        print(seriesId)
         nextEpisodeDate,latestEpisode = getDataFromNet(cursor,seriesNameList[count],returnDate=True)
         if(nextEpisodeDate == -1):
             setIsComplete(cursor,seriesId)
