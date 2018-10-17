@@ -7,39 +7,48 @@ from time import time
 from scraper.search import getNameLink
 from scraper.airDataFetcher import checkIfSeriesComplete,getNextEpisodeDate
 from util.databaseUtil import savedb
-from database.operationsUtil.seriesUtil import nextEpisodeStored,isComplete
+from database.operationsUtil.seriesUtil import nextEpisodeStored,isComplete,updateSeriesInfo
 
+def getDataFromDatabase(cursor,seriesName):
+
+    possibleNextEpisode = nextEpisodeStored(cursor,seriesName)
+    if(possibleNextEpisode != None):
+        return possibleNextEpisode
 
 #return -2 if the series is non-existent
 #return -1 if the series is complete
 #return the date in numbered format : yyyymmdd if the series is ongoing
-def getData(seriesName,returnDate=False,seriesId=-1):
-    mydb = connect()
-    cursor = mydb.cursor()
-    if(seriesId!=-1):
-        if(isComplete(cursor,seriesId) == 1):
-            print(seriesId,"is  complete")
-            return -1
-        print(seriesId,"is not complete")
-        possibleNextEpisode = nextEpisodeStored(cursor,seriesId)
-        if(possibleNextEpisode != None):
-            return possibleNextEpisode
-
+def getDataFromNet(cursor,seriesName,returnDate=False):
     name,link,year = getNameLink(seriesName,cursor)
-    savedb(mydb,cursor)
-    soup = getSoup(link)
 
+    soup = getSoup(link)
     if(soup == None):
+        savedb(mydb,cursor)
         return -2
     if(checkIfSeriesComplete(soup)):
+        updateSeriesInfo(cursor,name,link,year,-1)
+        savedb(mydb,cursor)
         return -1
-
+    print("getting the next episode")
     nextEpisodeDate = getNextEpisodeDate(soup)
+    print("updating the series info")
+    updateSeriesInfo(cursor,name,link,year,nextEpisodeDate)
+    savedb(mydb,cursor)
     return nextEpisodeDate
-
-'''message = "vinay"
-message = getData('got')
-
+def getData(keyword):
+    mydb = connect()
+    cursor = mydb.cursor()
+    possibleNextEpisode = getDataFromDatabase(cursor,keyword)
+    if(possibleNextEpisode != None):
+        return possibleNextEpisode
+    else:
+        return getDataFromNet(cursor,seriesName,returnDate=True)
+message = "vinay"
+#message = getData('got')
+mydb = connect()
+cursor = mydb.cursor()
+#print(cursor)
+getDataFromNet(cursor,'two and a half men')
 
 print(message)
 targetMail = "ihm2015004@iiita.ac.in"

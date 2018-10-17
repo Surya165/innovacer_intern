@@ -12,6 +12,15 @@ def getSeriesList(cursor):
     idList = [x[0] for x in result]
     nameList =[x[1] for x in result ]
     return idList,nameList
+def getSeriesIdByLink(cursor,link):
+    select = "select id from series where link='"+link+"';"
+    cursor.execute(select)
+    print(select)
+    result = cursor.fetchall()
+    if(len(result) == 0):
+        return -1
+    else:
+        return result[0][0]
 def insertNameLink(name,title,link,year,cursor):
     insert = "insert into nameLinks(name,link,title,year) values"
     insert += "('"+name+"',"
@@ -32,32 +41,24 @@ def isComplete(cursor,seriesId):
 def isSent(seriesId,cursor):
     return False
 
-def nextEpisodeStored(cursor,seriesId):
-
-    #for unrecognisedTag
-    search = "select nextEpisode from series where id="+str(seriesId)+";"
+def nextEpisodeStored(cursor,seriesName):
+    search = "select nextEpisode from series where name='"+seriesName+"';"
     cursor.execute(search)
     result = cursor.fetchall()
     if(len(result) != 0):
         return result[0][0]
-    #end for unrecognisedTag
 
-    '''
-    #for unrecognisedTag
-    #get title from the tag name
     search="select title from nameLinks where name='"+seriesName.lower()+"'";
     cursor.execute(search)
     result = cursor.fetchall()
     if(len(result) == 0):
         return None
-    #end get title from tag name
 
     title = result[0][0]
     search = "select nextEpisode from series where name='"+title+"';"
     cursor.execute(search)
     result = cursor.fetchall()
     return result[0][0]
-    #end for unrecognisedTag'''
 
 def seriesLinkExists(link,cursor):
     search = "select name from series where link='"+link+"';"
@@ -68,7 +69,19 @@ def seriesLinkExists(link,cursor):
 def setIsComplete(cursor,seriesId):
     update ="update series set isComplete=1 where id="+str(seriesId);
     cursor.execute(update)
-def updateNextEpisodeDate(cursor,seriesId,nextEpisodeDate):
-    #nextEpisode = getData("got",returnDate=True)
-    #print(nextEpisode)
-    return
+def updateSeriesInfo(cursor,name,link,year,nextEpisodeDate):
+    id = "select id from series where link='"+link+"';"
+    print(name,link,year,nextEpisodeDate)
+    cursor.execute(id)
+    result = cursor.fetchall()
+    if(len(result) != 0):
+        id = result[0][0]
+        update = "update series set name='"+name+"',"
+        update += " year="+str(year)+ ", "
+        update += "nextEpisodeDate="+str(nextEpisodeDate)+";"
+        print(update)
+    else:
+        insert = "insert into series (name,link,year,nextEpisode) values"
+        insert += "('"+name+"','"+link+"',"+str(year)+","+str(nextEpisodeDate)+");"
+        print(insert)
+        cursor.execute(insert)

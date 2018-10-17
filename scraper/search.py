@@ -2,13 +2,13 @@ import sys
 sys.path.append("..")
 from util.scrapeUtil import getSoup
 from config import baseLink as baseLink
-from database.operationsUtil.seriesUtil import insertNameLink
+from database.operationsUtil.seriesUtil import insertNameLink,getSeriesIdByLink
 def checkNameInDatabase(name,cursor):
-    search = "select title,link,year from nameLinks where lower(name)='"+name.lower()+"';"
+    search = "select title,link,year,id from nameLinks where lower(name)='"+name.lower()+"';"
     cursor.execute(search)
     result = cursor.fetchall()
     if(len(result) == 0):
-        return(None,None,None)
+        return(None,None,None,None)
     return result[0]
 def getSeriesSearchPage(seriesName):
     link = 'https://www.imdb.com/find?ref_=nv_sr_fn&q='+seriesName+'&s=all'
@@ -48,7 +48,7 @@ def searchIMDB(seriesName,forList=0):
         return linksList,namesList
     return None
 def getNameLink(series,cursor):
-    name,link,year = checkNameInDatabase(series,cursor)
+    name,link,year,id = checkNameInDatabase(series,cursor)
     if(name == None and link == None):
         print("Fetching the link for "+series)
         link,name = searchIMDB(series)
@@ -58,6 +58,7 @@ def getNameLink(series,cursor):
         year = year[1:-1]
 
         insertNameLink(series,name,link,year,cursor)
+        id = getSeriesIdByLink(cursor,link)
         return(name,link,year)
     else:
         print("Loading from the stored link for "+name)
