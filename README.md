@@ -12,7 +12,7 @@
 ![](images/cd_var.png)\
 \
 **Clone the code into the repostory**\
-![](images/clone_code.png)\
+![](images/images/clone_code.png)\
 **cd to innovacer_intern and import database**\
 ![](import_database.png)\
 **Go to localhost/innovacer_intern/prompt/**\
