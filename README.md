@@ -1,2 +1,2 @@
-**Install apache**
+**Install apache**  
 ![](images/install_apache.png)
