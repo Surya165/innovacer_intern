@@ -19,6 +19,6 @@ if(isset($_POST['submit']))
   fwrite($file,$input);
   fclose($file);
   $msg = exec("python3 ../database/dumpDatabase.py");
-  //echo "<p margin-top='400px'>".$msg."</p>";
+  $msg = exec("python3 remind.py");
 }
  ?>
